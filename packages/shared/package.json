@@ -1,4 +1,10 @@
 {
   "name": "@kuro-timeline/shared",
-  "private": true
+  "private": true,
+  "files": [
+    "tsconfig.base.json"
+  ],
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
 }
