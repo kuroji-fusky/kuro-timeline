@@ -1,6 +1,12 @@
-import { KuroTimelineClient } from "../client";
+import type { KuroTimelineClient } from "../client";
 
 export interface PlayheadData {
+  playheadPosition: number
+  bounds: DOMRect
+}
+
+interface PlayheadGetPositionOptions {
+  formatAs: "number" | "timestamp"
 }
 
 export class TimelinePlayhead {
@@ -10,7 +16,14 @@ export class TimelinePlayhead {
     this.position = 0
   }
 
-  async getPosition() { }
+  /** Triggers an update if the playhead is moved */
+  onMove(cb: (data: PlayheadData) => Promise<void>) { }
+
+  /** Triggers if the playhead's state has changed */
+  onUpdateState(cb: (data: PlayheadData) => Promise<void>) { }
+
+  /** Get the current playhead position */
+  async getPosition(options?: Partial<PlayheadGetPositionOptions>) { }
   async setPosition(timestamp: number | string) { }
 
   async resetPosition() {
