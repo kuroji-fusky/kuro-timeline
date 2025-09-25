@@ -1,4 +1,19 @@
 import { TimelineMarker, TimelinePlayhead, TimelineTrack } from "./features";
+import type { TimelinePlugin } from "./plugin";
+
+interface TimelineOptions {
+  /**
+   * Specifies what mode the timeline will operate in, set to `basic` by default.
+   * 
+   * - `basic`: Only provides the basic functions and can extend built-in plugins, but not custom ones
+   * - `advanced`: Includes all the functions and can extend to *any* plugin
+   */
+  mode: "basic" | "advanced"
+  /**
+   * Provide a url connection to a database
+   */
+  remoteUrl: string
+}
 
 /**
  * The base class for handling timeline UI.
@@ -10,7 +25,7 @@ export class KuroTimelineClient {
   public marker: TimelineMarker
   public track: TimelineTrack
 
-  constructor(protected tlElement: string | Element, private options?: Record<string, any>) {
+  constructor(protected tlElement: string | Element, private options?: Partial<TimelineOptions>) {
     const isElementString = typeof tlElement === "string"
 
     if (!(isElementString || tlElement instanceof Element)) {
@@ -19,6 +34,7 @@ export class KuroTimelineClient {
     // Check if the selector is a valid HTML element
     if (isElementString) {
       try {
+        // biome-ignore lint/style/noNonNullAssertion: necessary for dealing with DOM elements
         this.tlElement = document.querySelector(tlElement)!
       } catch {
         new TypeError("Element not found or invalid")
@@ -38,7 +54,7 @@ export class KuroTimelineClient {
     this.track = new TimelineTrack(this)
   }
 
-  registerPlugin() { }
+  registerPlugin(...plugins: TimelinePlugin[]) { }
 
   init() {
     if (this.#__INIT_INVOKED) {
@@ -48,8 +64,12 @@ export class KuroTimelineClient {
     this.#__INIT_INVOKED = true
   }
 
-  on(event: string, cb: () => void) {}
+  /** Hook on events */
+  on(event: string, cb: () => void) { }
+
+  /** Fire events */
   emit(event: string, cb: () => void) { }
 
-  dispose() {}
+  /** Terminate all event listeners */
+  dispose() { }
 }
