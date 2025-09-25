@@ -21,7 +21,9 @@
 Once the worker and event listeners are ready, it calls the `onReady()` (or `on("ready", <callback>)`) event, and internally dispatches events from both `init()` and `registerPlugins()`.
 
 > [!NOTE]
-> The `init()` method is only called *once*. The following subsequent calls after that will be ignored. It shouldn't be placed on `group()` either as it does substantially nothing and meant for initialization and won't be scoped.
+> The `init()` method is only called *once*. The following subsequent calls after that will be ignored.
+> 
+> It shouldn't be placed on `group()` either as it's a scoped async function, therefore it does substantially nothing and gets ignored. `init()`, as the name implies, is meant for initialization only.
 
 ```ts
 const tl = new KuroTimelineClient("#tl")
