@@ -3,11 +3,11 @@
 // 
 // I wouldn't be surprised if someone made an inflation mod of it
 // because THAT will be a thing
-export abstract class TimelinePlugin { }
+abstract class _TimelinePluginBase { }
 
 /** For built-in plugins only, don't use or you will die */
-abstract class _BuiltinPlugin extends TimelinePlugin {
+abstract class _BuiltinPlugin extends _TimelinePluginBase {
   protected readonly __built_in = true as const
 }
 
-class DefineTimelinePlugin extends TimelinePlugin { }
+export class TimelinePlugin extends _TimelinePluginBase { }
