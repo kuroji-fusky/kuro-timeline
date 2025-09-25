@@ -20,16 +20,18 @@ interface TimelineOptions {
  */
 export class KuroTimelineClient {
   #__INIT_INVOKED: boolean;
+  #__INIT_ABORT: AbortController;
 
   public playhead: TimelinePlayhead
   public marker: TimelineMarker
   public track: TimelineTrack
 
   constructor(protected tlElement: string | Element, private options?: Partial<TimelineOptions>) {
+    // Init DOM stuff
     const isElementString = typeof tlElement === "string"
 
     if (!(isElementString || tlElement instanceof Element)) {
-      new TypeError("Element should either be a CSS selector or a vaild HTML element")
+      throw new TypeError("Element should either be a CSS selector or a vaild HTML element")
     }
     // Check if the selector is a valid HTML element
     if (isElementString) {
@@ -37,7 +39,7 @@ export class KuroTimelineClient {
         // biome-ignore lint/style/noNonNullAssertion: necessary for dealing with DOM elements
         this.tlElement = document.querySelector(tlElement)!
       } catch {
-        new TypeError("Element not found or invalid")
+        throw new TypeError("Element not found or invalid")
       }
     }
 
@@ -47,6 +49,7 @@ export class KuroTimelineClient {
 
     this.options = options
     this.#__INIT_INVOKED = false
+    this.#__INIT_ABORT = new AbortController()
 
     // Mount all the core features
     this.playhead = new TimelinePlayhead(this)
@@ -56,12 +59,20 @@ export class KuroTimelineClient {
 
   registerPlugin(...plugins: TimelinePlugin[]) { }
 
-  init() {
+  /**
+   * Some code to be run before timeline logic and the worker has been mounted
+   * 
+   * Note that this method can't be used inside `group()`, nor it can be called more than once.
+   */
+  async init(cb: () => void) {
     if (this.#__INIT_INVOKED) {
       throw new ReferenceError("init has been called and cannot be called again")
     }
 
+    window.addEventListener("DOMContentLoaded", cb, { signal: this.#__INIT_ABORT.signal })
+
     this.#__INIT_INVOKED = true
+    this.#__INIT_ABORT.abort()
   }
 
   /** Hook on events */
@@ -70,6 +81,17 @@ export class KuroTimelineClient {
   /** Fire events */
   emit(event: string, cb: () => void) { }
 
-  /** Terminate all event listeners */
+  /** 
+   * Terminates event listeners but keeps communications with the worker
+   * 
+   * This shouldn't be called manually, unless if you have `options.autoBlur` disabled.
+   */
+  hibernate() { }
+
+  /** Terminate all event listeners and disconnects communication with the worker
+   * 
+   * This is a last-ditch option, as you'll need to re-initialize or requiring
+   * the end user to refresh the browser
+   */
   dispose() { }
 }
