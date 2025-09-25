@@ -13,6 +13,10 @@ interface TimelineOptions {
    * Provide a url connection to a database
    */
   remoteUrl: string
+  /**
+   * Enable debug mode
+   */
+  debug: boolean
 }
 
 /**
@@ -64,7 +68,7 @@ export class KuroTimelineClient {
    * 
    * Note that this method can't be used inside `group()`, nor it can be called more than once.
    */
-  async init(cb: () => void) {
+  init(cb: () => void) {
     if (this.#__INIT_INVOKED) {
       throw new ReferenceError("init has been called and cannot be called again")
     }

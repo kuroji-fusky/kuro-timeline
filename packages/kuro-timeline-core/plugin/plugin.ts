@@ -3,11 +3,20 @@
 // 
 // I wouldn't be surprised if someone made an inflation mod of it
 // because THAT will be a thing
-abstract class _TimelinePluginBase { }
+abstract class _TimelinePluginBase {
+  /** If set to `true`, debug events and messaged will be logged to the browser console. */
+  protected debugMode = false
+}
 
 /** For built-in plugins only, don't use or you will die */
 abstract class _BuiltinPlugin extends _TimelinePluginBase {
   protected readonly __built_in = true as const
 }
 
-export class TimelinePlugin extends _TimelinePluginBase { }
+export class TimelinePlugin extends _TimelinePluginBase {
+  constructor() {
+    super()
+
+    this.debugMode = true
+  }
+}
